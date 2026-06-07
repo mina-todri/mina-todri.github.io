@@ -115,7 +115,6 @@ function tick() {
     requestAnimationFrame(tick);
 }
 tick();
-
 // ── SCROLL REVEAL ──────────────────────────
 const obs = new IntersectionObserver(entries => {
     entries.forEach(e => {
@@ -180,25 +179,40 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 });
 
 // ── FORM ──────────────────────────────────
+        async function handleSubmit() {
             const btn = document.getElementById('formBtn');
             const name = document.getElementById('fname').value;
             const email = document.getElementById('femail').value;
             const msg = document.getElementById('fmsg').value;
             if (!name || !email || !msg) return;
             btn.classList.add('loading');
-            btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" style="animation:spin 1s linear infinite" fill="none" stroke="#080b14" stroke-width="2" stroke-linecap="round"><circle cx="[...]
+            btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" style="animation:spin 1s linear infinite" fill="none" stroke="#080b14" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Sending...';
+            const res = await fetch('https://formspree.io/f/xredyvko', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name,
+                    email,
+                    message: msg
+                })
+            });
             btn.classList.remove('loading');
+            if (res.ok) {
                 btn.classList.add('sent');
-                btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#080b14" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2[...]
+                btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#080b14" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg> Sent!';
                 document.getElementById('fname').value = '';
                 document.getElementById('femail').value = '';
                 document.getElementById('fmsg').value = '';
                 setTimeout(() => {
                     btn.classList.remove('sent');
-                    btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#080b14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1=[...]
+                    btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#080b14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Message';
                 }, 3000);
+            } else {
+                btn.innerHTML = 'Failed. Try again.';
             }
-
+        }
 // ── SPIN KEYFRAME ─────────────────────────
 const style = document.createElement('style');
 style.textContent = '@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
